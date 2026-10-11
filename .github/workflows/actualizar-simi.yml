@@ -1,0 +1,60 @@
+# Demo en GitHub Pages con los inmuebles de SIMI.
+#
+# GitHub Pages no puede correr el proxy PHP, así que cada hora esta tarea le
+# pide los inmuebles a SIMI (con el token guardado como secreto del
+# repositorio, que nadie puede ver) y publica la página con esa copia.
+# Si SIMI falla, no se publica nada y queda la versión anterior.
+#
+# Se copia a .github/workflows/ del repositorio re-inmobiliaria-demo con
+# scripts/publicar-demo.sh. No se edita allá: se edita aquí.
+name: Actualizar inmuebles de SIMI
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '17 * * * *' # cada hora, en el minuto 17
+  workflow_dispatch: # botón "Run workflow" para actualizar ya
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Armar la página
+        run: |
+          mkdir sitio
+          cp -R index.html assets sitio/
+          touch sitio/.nojekyll
+
+      - name: Copiar inmuebles de SIMI
+        env:
+          SIMI_BASE_URL: ${{ secrets.SIMI_BASE_URL }}
+          SIMI_TOKEN: ${{ secrets.SIMI_TOKEN }}
+          SIMI_INMOBILIARIA_ID: ${{ secrets.SIMI_INMOBILIARIA_ID }}
+        run: node scripts/simi-snapshot.mjs sitio/simi-data
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: sitio
+
+      - id: deploy
+        uses: actions/deploy-pages@v4
