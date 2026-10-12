@@ -42,7 +42,7 @@ jobs:
       - name: Armar la página
         run: |
           mkdir sitio
-          cp -R index.html assets sitio/
+          rsync -a --exclude .git --exclude .github --exclude scripts --exclude README.md --exclude sitio ./ sitio/
           touch sitio/.nojekyll
 
       - name: Copiar inmuebles de SIMI
@@ -51,6 +51,9 @@ jobs:
           SIMI_TOKEN: ${{ secrets.SIMI_TOKEN }}
           SIMI_INMOBILIARIA_ID: ${{ secrets.SIMI_INMOBILIARIA_ID }}
         run: node scripts/simi-snapshot.mjs sitio/simi-data
+
+      - name: robots.txt (sitio de pruebas, sin indexar)
+        run: node scripts/generar-seo.mjs --salida sitio --dominio https://ronal1707.github.io/re-inmobiliaria-demo --no-indexar
 
       - uses: actions/upload-pages-artifact@v3
         with:

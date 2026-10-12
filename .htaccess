@@ -1,0 +1,10 @@
+# Dominio oficial (cPanel): cualquier dirección de la página la atiende
+# index.html, para que /inmuebles/861-81792 funcione al recargar o al entrar
+# desde Google. Los archivos que existen (imágenes, simi-data, robots.txt…) se
+# sirven tal cual.
+Options -MultiViews
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+RewriteRule ^ index.html [L]
