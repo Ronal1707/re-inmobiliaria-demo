@@ -39,6 +39,7 @@ fs.writeFileSync(
     'Disallow: /panel-interno',
     'Disallow: /favoritos',
     'Disallow: /gracias',
+    'Disallow: /manual',
     '',
     `Sitemap: ${dominio}/sitemap.xml`,
     '',
