@@ -37,7 +37,6 @@ fs.writeFileSync(
     'Allow: /',
     '# Áreas privadas y páginas sin valor para buscadores',
     'Disallow: /panel-interno',
-    'Disallow: /panel-invitado',
     'Disallow: /favoritos',
     'Disallow: /gracias',
     '',
